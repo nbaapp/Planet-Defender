@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Planet
+  - Camera
+  - AffectedByGravity
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - Player
+  - Water
+  - UI
+  - Player Attacks
+  - City
+  - Enemy
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: City
+    uniqueID: 1808146733
+    locked: 0
+  - name: Attacks
+    uniqueID: 1239260653
+    locked: 0
+  - name: Player
+    uniqueID: 1996750443
+    locked: 0
+  - name: Effects
+    uniqueID: 1803614383
+    locked: 0
+  - name: Planet
+    uniqueID: 1939586869
+    locked: 0
