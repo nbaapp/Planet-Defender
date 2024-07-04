@@ -38,30 +38,26 @@ public class Bullet : MonoBehaviour
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
     }
 
-
     void OnCollisionEnter2D(Collision2D collision)
     {
-        // Instantiate the burst effect at the point of collision
         if (burstEffectPrefab != null)
         {
             Instantiate(burstEffectPrefab, transform.position, Quaternion.identity);
         }
 
-        //check if the bullet collided with an alien layer
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+        Unit unit = collision.gameObject.GetComponent<Unit>();
+        if (unit != null)
         {
-            // Get the Alien component from the collided object
-            Alien alien = collision.gameObject.GetComponent<Alien>();
-
-            // Check if the alien is not null
-            if (alien != null)
-            {
-                // Call the Die method on the alien
-                alien.TakeDamage(bulletDamage);
-            }
+            unit.TakeDamage(bulletDamage);
         }
 
-        // Destroy the bullet on collision
+        City city = collision.gameObject.GetComponent<City>();
+        if (city != null)
+        {
+            city.TakeDamage(bulletDamage);
+        }
+
         Destroy(gameObject);
     }
+    
 }

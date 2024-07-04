@@ -1,48 +1,22 @@
 using UnityEngine;
 
-public class Alien : MonoBehaviour
+public class Alien : Unit
 {
-    public int maxHealth = 50; // Maximum health of the alien
-    protected int currentHealth; // Current health of the alien
     public float moveSpeed = 2f; // Movement speed of the alien
 
     protected Transform targetCity; // The city that the alien is targeting
     protected bool isGrounded; // Check if the alien is grounded
     protected Transform planetCenter;
 
-    protected virtual void Start()
+    protected override void Start()
     {
-        currentHealth = maxHealth; // Initialize health
+        base.Start();
         planetCenter = GameObject.FindWithTag("Planet").transform;
     }
 
     protected virtual void FixedUpdate()
     {
         AlignToPlanetSurface();
-    }
-
-    public void TakeKnockback(Vector2 direction, float force)
-    {
-        // Apply a force in the specified direction
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        rb.AddForce(direction * force, ForceMode2D.Impulse);
-    }
-
-    // Method to apply damage to the alien
-    public void TakeDamage(int damage)
-    {
-        currentHealth -= damage;
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
-    }
-
-    // Method to be overridden by specific alien types for custom death behavior
-    protected virtual void Die()
-    {
-        // Destroy the alien object (can be overridden for custom behavior)
-        Destroy(gameObject);
     }
 
     // Method to find the nearest city (could be implemented to get the closest target city)
@@ -101,5 +75,11 @@ public class Alien : MonoBehaviour
         {
             isGrounded = true;
         }
-    } 
+    }
+
+    protected override void Die()
+    {
+        logic.EnemyDefeated();
+        base.Die();
+    }
 }

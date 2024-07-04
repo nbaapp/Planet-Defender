@@ -3,29 +3,26 @@ using UnityEngine;
 public class Walker : Alien
 {
     private Rigidbody2D rb;
-    private bool hasLanded = false;
-    public float minFallAngle = 70f; // Minimum angle relative to the planet's surface
-    public float maxFallAngle = 110f; // Maximum angle relative to the planet's surface
-    public float initialFallForce = 5f; // Initial force applied when spawning
+    private bool hasLanded;
+    public float initialFallForce = 10f; // The force applied to simulate falling
+    public float minFallAngle = -15f; // Minimum angle for the initial fall direction
+    public float maxFallAngle = 15f; // Maximum angle for the initial fall direction
+    public GameObject bulletPrefab; // Reference to the bullet prefab
+    public float attackRange = 10f; // Range within which the Walker can attack
+    public float attackInterval = 2f; // Interval between attacks
+
+    private float lastAttackTime;
 
     protected override void Start()
     {
         base.Start();
         rb = GetComponent<Rigidbody2D>();
-        
-        // Apply an initial downward force to simulate falling from the sky
         ApplyInitialFall();
-
     }
 
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
-        Move();
-    }
-
-    private void Move()
-    {
         if (!hasLanded)
         {
             // Check if the Walker has landed
@@ -40,6 +37,13 @@ public class Walker : Alien
         {
             // Move towards the city after landing
             MoveTowardsCity();
+
+            // Check if it's time to attack
+            if (Time.time > lastAttackTime + attackInterval)
+            {
+                Attack();
+                lastAttackTime = Time.time;
+            }
         }
     }
 
@@ -79,6 +83,54 @@ public class Walker : Alien
 
         // Apply the initial force to the Rigidbody
         rb.AddForce(fallDirection * initialFallForce, ForceMode2D.Impulse);
+    }
+
+    private void Attack()
+    {
+        Transform target = FindNearestTarget();
+        if (target == null) return;
+
+        Vector2 direction = (target.position - transform.position).normalized;
+
+        // Instantiate and shoot the bullet
+        GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+        Bullet bulletComponent = bullet.GetComponent<Bullet>();
+        if (bulletComponent != null)
+        {
+            bulletComponent.SetVelocity(direction);
+            bulletComponent.SetRotation(direction);
+        }
+    }
+
+    private Transform FindNearestTarget()
+    {
+        float closestDistance = float.MaxValue;
+        Transform nearestTarget = null;
+
+        // Check for nearest city within range
+        foreach (var city in FindObjectsOfType<City>())
+        {
+            float distance = Vector2.Distance(transform.position, city.transform.position);
+            if (distance < attackRange && distance < closestDistance)
+            {
+                closestDistance = distance;
+                nearestTarget = city.transform;
+            }
+        }
+
+        // Check for nearest player within range
+        var player = FindObjectOfType<Player>(); // Assuming you have a PlayerMovement script
+        if (player != null)
+        {
+            float distance = Vector2.Distance(transform.position, player.transform.position);
+            if (distance < attackRange && distance < closestDistance)
+            {
+                closestDistance = distance;
+                nearestTarget = player.transform;
+            }
+        }
+
+        return nearestTarget;
     }
 
     protected override void Die()

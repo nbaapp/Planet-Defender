@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerAttacks : MonoBehaviour
+public class PlayerAttacks : Unit
 {
     public GameObject bulletPrefab; // Bullet prefab to instantiate
     public Transform firePoint; // The point from where the bullets are fired
@@ -10,6 +10,7 @@ public class PlayerAttacks : MonoBehaviour
     private Vector2 aimDirection;
     private bool isAttacking;
     private float lastFireTime;
+    public HealthBar healthBar;
 
     void Awake()
     {
@@ -89,5 +90,16 @@ public class PlayerAttacks : MonoBehaviour
         // Set the bullet's velocity and rotation
         bullet.SetVelocity(fireDirection);
         bullet.SetRotation(fireDirection);
+    }
+
+    public override void TakeDamage(int damage)
+    {
+        // Call the base class method to handle the damage
+        currentHealth -= damage;
+        healthBar.SetHealth(currentHealth);
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
     }
 }

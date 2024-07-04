@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Explosion : MonoBehaviour
 {
-    
     public float duration = 1f; // Duration of the explosion effect
     public float radius = 1f;
     public float force = 10f;
@@ -15,7 +14,8 @@ public class Explosion : MonoBehaviour
 
     public float shakeDuration = 0.5f;
     public float shakeMagnitude = 0.3f;
-    private List<Alien> affectedEnemies = new List<Alien>();
+    private List<Unit> affectedUnits = new List<Unit>();
+    private List<City> affectedCities = new List<City>();
 
     void Awake()
     {
@@ -36,16 +36,23 @@ public class Explosion : MonoBehaviour
 
     private IEnumerator HandleExplosion()
     {
-        // Detect enemies within the explosion radius
+        // Detect enemies and cities within the explosion radius
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, radius, enemyLayer);
-        
+
         foreach (var hitCollider in hitColliders)
         {
-            Alien enemy = hitCollider.GetComponent<Alien>();
-            if (enemy != null && !affectedEnemies.Contains(enemy))
+            Unit unit = hitCollider.GetComponent<Unit>();
+            if (unit != null && !affectedUnits.Contains(unit))
             {
-                affectedEnemies.Add(enemy);
-                ApplyExplosionEffects(enemy);
+                affectedUnits.Add(unit);
+                ApplyExplosionEffects(unit);
+            }
+
+            City city = hitCollider.GetComponent<City>();
+            if (city != null && !affectedCities.Contains(city))
+            {
+                affectedCities.Add(city);
+                ApplyExplosionEffects(city);
             }
         }
 
@@ -55,16 +62,22 @@ public class Explosion : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void ApplyExplosionEffects(Alien enemy)
+    private void ApplyExplosionEffects(Unit unit)
     {
-        // Calculate the direction from the explosion to the enemy
-        Vector2 direction = (enemy.transform.position - transform.position).normalized;
-        
+        // Calculate the direction from the explosion to the unit
+        Vector2 direction = (unit.transform.position - transform.position).normalized;
+
         // Apply knockback
-        enemy.TakeKnockback(direction, force);
-        
+        unit.TakeKnockback(direction, force);
+
         // Apply damage
-        enemy.TakeDamage(damage);
+        unit.TakeDamage(damage);
+    }
+
+    private void ApplyExplosionEffects(City city)
+    {
+        // Apply damage to the city
+        city.TakeDamage(damage);
     }
 
     private void CameraShake()
@@ -75,11 +88,10 @@ public class Explosion : MonoBehaviour
         }
     }
 
-    //draw the explosion radius in the editor
+    // Draw the explosion radius in the editor
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, radius);
     }
-    
 }
